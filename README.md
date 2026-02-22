@@ -1,144 +1,78 @@
-# 📦 Kubernetes kubectl – Comandos Mais Comuns
+# 📘 AKS Study Notes – kubectl + Troubleshooting
 
-Este repositório é um **cheat sheet prático** com os comandos mais usados do `kubectl` no dia a dia, organizado por categoria.
+Este repositório foi organizado para estudo de **AKS (Azure Kubernetes Service)** com foco em:
+- consulta rápida de comandos
+- revisão para entrevistas
+- troubleshooting por cenário
 
-O objetivo é servir como **material de estudo**, **consulta rápida** e **revisão antes de entrevistas**.
+## 🗂️ Estrutura
+
+- [Cheat Sheet Rápido](docs/00-cheat-sheet.md)
+- [Cluster e Contexto](docs/01-cluster-context.md)
+- [Namespaces](docs/02-namespaces.md)
+- [Pods](docs/03-pods.md)
+- [Deployments](docs/04-deployments.md)
+- [Services e Networking](docs/05-services-network.md)
+- [ConfigMaps e Secrets](docs/06-configmaps-secrets.md)
+- [Debug e Troubleshooting](docs/07-debug-troubleshooting.md)
+- [AKS Específico](docs/08-aks-especifico.md)
+- [Boas Práticas](docs/09-boas-praticas.md)
+- [Glossário](docs/glossario.md)
 
 ---
 
-## 🔍 Informações do Cluster
+## 🎯 Comandos por cenário
+
+### 1) “Não consigo acessar o app”
 
 ```bash
-kubectl version
-kubectl cluster-info
-kubectl get nodes
-kubectl describe node <node-name>
-kubectl config get-contexts
-kubectl config use-context <context>
+kubectl get svc -A
+kubectl describe svc <service-name> -n <namespace>
+kubectl get endpoints <service-name> -n <namespace>
+kubectl port-forward svc/<service-name> 8080:80 -n <namespace>
 ```
 
----
-
-## 📂 Namespaces
+### 2) “Pod não sobe / fica em CrashLoopBackOff”
 
 ```bash
-kubectl get namespaces
 kubectl get pods -n <namespace>
-kubectl config set-context --current --namespace=<namespace>
+kubectl describe pod <pod-name> -n <namespace>
+kubectl logs <pod-name> -n <namespace>
+kubectl logs <pod-name> -c <container-name> -n <namespace>
+```
+
+### 3) “Deploy não atualiza”
+
+```bash
+kubectl rollout status deployment/<deployment-name> -n <namespace>
+kubectl rollout history deployment/<deployment-name> -n <namespace>
+kubectl rollout undo deployment/<deployment-name> -n <namespace>
+```
+
+### 4) “Quero validar antes de aplicar”
+
+```bash
+kubectl diff -f ./k8s/
+kubectl apply --dry-run=client -f ./k8s/
+kubectl kustomize overlays/dev
+kubectl diff -k overlays/dev
 ```
 
 ---
 
-## 📦 Pods
+## 📌 Convenção dos arquivos
 
-```bash
-kubectl get pods
-kubectl get pods -o wide
-kubectl describe pod <pod-name>
-kubectl logs <pod-name>
-kubectl logs <pod-name> -c <container-name>
-kubectl exec -it <pod-name> -- /bin/sh
-kubectl delete pod <pod-name>
-```
+Cada arquivo em `docs/` segue o mesmo padrão:
+1. Objetivo
+2. Comandos essenciais
+3. Exemplo prático (AKS)
+4. Erros comuns e correção
+5. Referências
 
 ---
 
-## 🚀 Deployments (sem Kustomize)
+## 🚀 Próximos passos sugeridos
 
-```bash
-kubectl apply -f deployment.yaml
-kubectl apply -f ./k8s/
-kubectl get deployments
-kubectl describe deployment <deployment-name>
-kubectl rollout status deployment <deployment-name>
-kubectl rollout history deployment <deployment-name>
-kubectl rollout undo deployment <deployment-name>
-kubectl scale deployment <deployment-name> --replicas=3
-kubectl delete -f deployment.yaml
-```
-
----
-
-## 🚀 Deployments (com Kustomize)
-
-```bash
-kubectl apply -k .
-kubectl apply -k overlays/dev
-kubectl apply -k overlays/staging
-kubectl apply -k overlays/prod
-kubectl get deployments
-kubectl describe deployment <deployment-name>
-kubectl rollout status deployment <deployment-name>
-kubectl rollout history deployment <deployment-name>
-kubectl rollout undo deployment <deployment-name>
-kubectl delete -k .
-```
-
-### Debug antes de aplicar
-
-```bash
-kubectl kustomize .
-kubectl diff -k .
-```
-
----
-
-## 🌐 Services & Networking
-
-```bash
-kubectl get services
-kubectl describe service <service-name>
-kubectl port-forward svc/<service-name> 8080:80
-kubectl get endpoints
-```
-
----
-
-## ⚙️ ConfigMaps & Secrets
-
-```bash
-kubectl get configmaps
-kubectl describe configmap <name>
-
-kubectl get secrets
-kubectl describe secret <name>
-kubectl get secret <name> -o yaml
-```
-
----
-
-## 🧪 Debug & YAML
-
-```bash
-kubectl get pod <pod-name> -o yaml
-kubectl explain pod
-kubectl explain deployment.spec
-```
-
----
-
-## 📈 Escalabilidade
-
-```bash
-kubectl get hpa
-kubectl describe hpa
-```
-
----
-
-## 🧹 Limpeza
-
-```bash
-kubectl get all
-kubectl delete pod --all
-kubectl delete all --all -n <namespace>
-```
-
----
-
-## 🎯 Objetivo
-
-Este repositório serve como:
-- material de estudo contínuo
-- consulta rápida no dia a dia
-- apoio para entrevistas técnicas
+- Adicionar exemplos com namespace fixo (`app-dev`, `app-prod`)
+- Incluir seção de comandos `az aks` para operações administrativas
+- Evoluir para MkDocs quando passar de ~15 arquivos
