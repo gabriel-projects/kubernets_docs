@@ -13,6 +13,18 @@ kubectl rollout undo deployment/<deployment> -n <namespace>
 kubectl scale deployment/<deployment> --replicas=3 -n <namespace>
 ```
 
+## Deployments (com Kustomize)
+```bash
+kubectl apply -k overlays/dev
+kubectl apply -k overlays/staging
+kubectl apply -k overlays/prod
+kubectl rollout status deployment/<deployment> -n <namespace>
+kubectl rollout history deployment/<deployment> -n <namespace>
+kubectl rollout undo deployment/<deployment> -n <namespace>
+kubectl diff -k overlays/dev
+kubectl kustomize overlays/dev
+```
+
 ## Exemplo prático (AKS)
 ```bash
 kubectl apply -f ./k8s/api-deployment.yaml -n app-dev
